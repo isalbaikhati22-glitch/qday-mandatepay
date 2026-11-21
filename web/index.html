@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MandatePay — capped, expiring, revocable agent payment mandates</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.min.js"></script>
+<script src="config.js"></script>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">M</div>
+    <div>
+      <h1>MandatePay</h1>
+      <p class="tagline">Give your AI agent a budget, not your wallet.</p>
+    </div>
+  </div>
+  <div class="head-right">
+    <span id="networkBadge" class="badge">QDay Aevum Testnet · 44005</span>
+    <button id="connectBtn" class="primary">Connect wallet</button>
+  </div>
+</header>
+
+<p class="intro">
+  A <strong>mandate</strong> escrows a fixed tUSD8 budget on-chain and authorises exactly one agent
+  address to pay exactly one payee — at most a set amount per payment, until a set expiry.
+  The agent never holds your keys or your funds. Revoke any time and the unspent budget
+  comes straight back. Every payment is a public, auditable event.
+</p>
+
+<div id="noContract" class="notice hidden">
+  No MandatePay address configured. Deploy the contract (see the repo README), set
+  <code>mandatePay</code> in <code>config.js</code>, or open this page with
+  <code>?contract=0x…</code>.
+</div>
+
+<section class="card" id="walletCard">
+  <h2>Wallet</h2>
+  <div class="grid">
+    <div><span class="label">Address</span><span id="wAddr" class="mono">not connected</span></div>
+    <div><span class="label">tQDAY (gas)</span><span id="wGas">—</span></div>
+    <div><span class="label">tUSD8</span><span id="wUsd">—</span></div>
+    <div><span class="label">MandatePay</span><span id="wContract" class="mono">—</span></div>
+  </div>
+</section>
+
+<div class="columns">
+  <section class="card">
+    <h2>Owner · Create a mandate</h2>
+    <label>Agent address (session key)<input id="cAgent" placeholder="0x…"></label>
+    <label>Payee address (only recipient allowed)<input id="cPayee" placeholder="0x…"></label>
+    <div class="row">
+      <label>Per-payment cap (tUSD8)<input id="cPerPay" type="number" min="0" step="0.000001" placeholder="1.5"></label>
+      <label>Total cap = escrow (tUSD8)<input id="cTotal" type="number" min="0" step="0.000001" placeholder="4"></label>
+    </div>
+    <div class="row">
+      <label>Expires in (hours)<input id="cHours" type="number" min="0.1" step="0.5" value="24"></label>
+      <label>Purpose<input id="cPurpose" placeholder="API credits — research agent"></label>
+    </div>
+    <button id="createBtn" class="primary">Approve + create mandate</button>
+    <p class="hint">Two transactions: approve the escrow amount, then create. The full total cap is
+    escrowed in the contract — that is what guarantees the caps hold.</p>
+  </section>
+
+  <section class="card">
+    <h2>Agent · Pay within a mandate</h2>
+    <label>Mandate ID<input id="pId" type="number" min="0" placeholder="0"></label>
+    <label>Amount (tUSD8)<input id="pAmount" type="number" min="0" step="0.000001" placeholder="1.5"></label>
+    <label>Reference (invoice / request id)<input id="pRef" placeholder="invoice-001"></label>
+    <button id="checkBtn">Check if this payment is allowed</button>
+    <button id="payBtn" class="primary">Pay</button>
+    <p class="hint">Only the mandate's agent can pay, only to its payee, only within the caps
+    and before expiry. The reference is hashed on-chain to bind the payment to your invoice.</p>
+  </section>
+</div>
+
+<section class="card">
+  <h2>My mandates <button id="refreshBtn" class="small">Refresh</button></h2>
+  <div id="mandateList" class="mandates"><p class="hint">Connect a wallet to load mandates you own or serve as agent for.</p></div>
+</section>
+
+<section class="card">
+  <h2>Activity (on-chain audit trail)</h2>
+  <div id="activity"><p class="hint">Recent MandatePay events will appear here.</p></div>
+</section>
+
+<div id="status" class="status"></div>
+
+<footer>
+  <p>MandatePay · Built for the Aevum Builder Challenge #1 on QDay Aevum testnet (chain 44005) ·
+  Token: tUSD8 · <a id="explorerLink" href="https://explorer-test.qday.info" target="_blank" rel="noopener">Explorer</a> ·
+  Open source (MIT)</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

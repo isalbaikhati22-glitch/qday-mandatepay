@@ -1,0 +1,39 @@
+=== MandatePay end-to-end demo (local anvil) ===
+Chain ID: 31337
+MockUSD8 deployed: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+MandatePay: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+Owner:  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Agent:  0x70997970C51812dc3A010C7d01b50e0d17dc79C8  (session key — can only pay within the mandate)
+Payee:  0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC  (the only address the agent can pay)
+Owner tUSD8 before: 100.0
+
+1) Owner approves 4.0 tUSD8 and creates the mandate (per-payment cap 1.5, expiry in 2h)
+   approve tx: 0x1c1357e0112ee73130cdb855fec72c7d3db4272212d0fd789a3f949917f389ca
+   createMandate tx: 0x8170dcb6862bf86d02ac0f2a61042c9e7115c2f823b7690c0ba8eca8b27a18ce  -> mandate #0
+   Escrow locked in contract: 4.0 tUSD8
+
+2.1) Agent pays 1.5 tUSD8 to the payee (ref: invoice-001)
+   pay tx: 0x4dbc155083da2b98f71973df1cd0a0eb65d4048b3b4d0cb38498b1df2fd932cf
+   Payee balance: 1.5 | remaining budget: 2.5
+2.2) Agent pays 1.5 tUSD8 to the payee (ref: invoice-002)
+   pay tx: 0xfb5deb1b78c307b1c0a6abd1723ec5f1962a13b43a573faeb0d68914778afcad
+   Payee balance: 3.0 | remaining budget: 1.0
+
+3) Agent tries to pay another 1.5 — only 1.0 remains
+   REFUSED on-chain: contract refused: OverTotalCap(amount=1500000, remaining=1000000)
+
+4) Owner revokes the mandate (kill switch)
+   revoke tx: 0xf81ea010556ee859ed48953a2d0cb4cbf1700e39cf4576cb7a83dc03f28fdbb9
+   Refunded to owner: 1.0 tUSD8
+
+5) Agent tries to pay the revoked mandate
+   REFUSED on-chain: contract refused: MandateNotActive()
+
+6) Audit trail for mandate #0 (events read from chain):
+   [block 5] Created: agent=0x70997970C51812dc3A010C7d01b50e0d17dc79C8 payee=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC perPay=1.5 total=4.0 purpose="Demo: research agent API budget"
+   [block 6] Payment: 1.5 tUSD8 -> 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC (total spent 1.5)
+   [block 7] Payment: 1.5 tUSD8 -> 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC (total spent 3.0)
+   [block 8] Revoked: refunded 1.0 tUSD8
+
+Final: owner 97.0 | payee 3.0 | escrow 0.0 tUSD8
+=== Demo complete ===

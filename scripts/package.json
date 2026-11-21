@@ -1,0 +1,1 @@
+{"dependencies":{"ethers":"^6.13.5"},"description":"MandatePay demo and utility scripts (ethers v6).","name":"mandatepay-scripts","private":true,"scripts":{"demo":"node demo.mjs","demo:testnet":"node demo.mjs --testnet"},"type":"module","version":"1.0.0"}

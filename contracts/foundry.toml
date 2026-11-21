@@ -1,0 +1,12 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc = "0.8.24"
+# Aevum is a Shanghai EVM: Cancun opcodes (MCOPY, TSTORE/TLOAD, blobs) revert there.
+evm_version = "shanghai"
+optimizer = true
+optimizer_runs = 200
+
+[rpc_endpoints]
+aevum = "https://rpc-test.qday.info"

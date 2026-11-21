@@ -1,0 +1,16 @@
+# dependencies
+node_modules/
+
+# foundry output
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# secrets — NEVER commit keys
+.env
+.env.*
+!.env.example
+scripts/.env.demo
+
+# misc
+.DS_Store
